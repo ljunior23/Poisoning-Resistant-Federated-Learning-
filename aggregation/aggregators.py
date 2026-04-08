@@ -1,19 +1,9 @@
-"""
-Aggregation strategies for Federated Learning.
-
-Implemented:
-  - FedAvg           : Standard weighted average.
-  - Median           : Coordinate-wise median (Byzantine-robust).
-  - TrimmedMean      : Trimmed mean (clips top/bottom fraction).
-  - Krum             : Selects the update closest to its neighbors.
-  - ReputationFedAvg : Reputation-score-weighted aggregation (our method).
-"""
 import torch
 import numpy as np
 from typing import List, Dict, Tuple
 
 
-# ─── Helpers ─────────────────────────────────────────────────────────────────
+# Helpers 
 
 def _stack_updates(updates: List[Dict[str, torch.Tensor]]) -> Dict[str, torch.Tensor]:
     """Stack a list of update dicts → {param: (N, *shape)} tensor dict."""
@@ -26,20 +16,14 @@ def _flat(update: Dict[str, torch.Tensor]) -> torch.Tensor:
     return torch.cat([v.flatten() for v in update.values()])
 
 
-# ─── FedAvg ──────────────────────────────────────────────────────────────────
+# FedAvg
 
 def fedavg(
     updates: List[Dict[str, torch.Tensor]],
     weights: List[float] = None,
     **kwargs,
 ) -> Dict[str, torch.Tensor]:
-    """
-    Weighted average of client updates.
-
-    Args:
-        updates: List of parameter-update dicts from clients.
-        weights: Per-client data-size weights (uniform if None).
-    """
+    """Federated Averaging (FedAvg) — simple weighted average of updates."""
     n = len(updates)
     if weights is None:
         weights = [1.0 / n] * n
@@ -53,7 +37,7 @@ def fedavg(
     return aggregated
 
 
-# ─── Coordinate-wise Median ──────────────────────────────────────────────────
+# Coordinate-wise Median 
 
 def coordinate_median(
     updates: List[Dict[str, torch.Tensor]],
@@ -64,20 +48,14 @@ def coordinate_median(
     return {k: stacked[k].median(dim=0).values for k in stacked}
 
 
-# ─── Trimmed Mean ─────────────────────────────────────────────────────────────
+# Trimmed Mean 
 
 def trimmed_mean(
     updates: List[Dict[str, torch.Tensor]],
     trim_fraction: float = 0.1,
     **kwargs,
 ) -> Dict[str, torch.Tensor]:
-    """
-    Coordinate-wise trimmed mean: removes top and bottom `trim_fraction`
-    of values before averaging.
-
-    Args:
-        trim_fraction: Fraction of clients to trim from each end (0–0.5).
-    """
+   
     n = len(updates)
     k = max(1, int(trim_fraction * n))
     stacked = _stack_updates(updates)
@@ -93,7 +71,7 @@ def trimmed_mean(
     return aggregated
 
 
-# ─── Krum ─────────────────────────────────────────────────────────────────────
+# rum
 
 def krum(
     updates: List[Dict[str, torch.Tensor]],
@@ -104,11 +82,6 @@ def krum(
     """
     Krum aggregation: selects the update(s) with smallest sum of squared
     distances to its nearest neighbors.
-
-    Args:
-        num_byzantine: Assumed number of Byzantine clients (f).
-        multi_krum:    Number of updates to select and average (Multi-Krum).
-                       Set to 1 for standard Krum.
     """
     n = len(updates)
     f = num_byzantine
@@ -135,7 +108,7 @@ def krum(
     return fedavg(selected_updates)
 
 
-# ─── Reputation-Weighted FedAvg (Our Method) ─────────────────────────────────
+# Reputation-Weighted FedAvg (Our Method)
 
 def reputation_fedavg(
     updates: List[Dict[str, torch.Tensor]],
@@ -145,10 +118,6 @@ def reputation_fedavg(
     """
     Reputation-score-weighted aggregation.
     Clients with lower reputation scores contribute less to the global model.
-
-    Args:
-        updates:           List of parameter-update dicts.
-        reputation_scores: Per-client reputation scores (non-negative).
     """
     scores = np.array(reputation_scores, dtype=float)
     scores = np.maximum(scores, 0.0)   # Clamp negatives to zero
@@ -162,7 +131,7 @@ def reputation_fedavg(
     return fedavg(updates, weights=weights)
 
 
-# ─── Aggregation Registry ─────────────────────────────────────────────────────
+# Aggregation Registry 
 
 AGGREGATION_METHODS = {
     "fedavg":          fedavg,
