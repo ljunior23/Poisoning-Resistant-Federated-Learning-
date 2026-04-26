@@ -1,16 +1,3 @@
-"""
-Blockchain-based Reputation Scoring System.
-
-Simulates an append-only ledger (blockchain) where each block records
-client gradient updates and their reputation scores per training round.
-Reputation is dynamically updated based on deviation from the consensus
-(median) update — the farther a client deviates, the lower their score.
-
-Smart contract logic:
-  - Automatic reputation decay/update after each round.
-  - Transparent, immutable audit trail per client.
-  - Reputation-gated participation: clients below threshold are excluded.
-"""
 import hashlib
 import json
 import time
@@ -20,7 +7,7 @@ from typing import Dict, List, Optional, Tuple
 from dataclasses import dataclass, field, asdict
 
 
-# ─── Block & Ledger ───────────────────────────────────────────────────────────
+# ──Block & Ledger
 
 @dataclass
 class ReputationBlock:
@@ -52,14 +39,7 @@ class ReputationBlock:
 
 
 class ReputationBlockchain:
-    """
-    Simulated blockchain for persistent client reputation tracking.
-
-    The chain maintains:
-      - Cumulative reputation score per client across all rounds.
-      - Per-round deviation records for auditability.
-      - An immutable hash-linked block structure.
-    """
+    """Simulated blockchain for persistent client reputation tracking. """
 
     GENESIS_SCORE = 1.0          # Starting reputation for all clients
     DECAY_RATE    = 0.1          # How quickly bad behavior reduces score
@@ -113,14 +93,7 @@ class ReputationBlockchain:
         """
         Smart contract logic: update reputation scores based on deviation
         from the consensus update.
-
-        Args:
-            round_id:         Current FL round.
-            updates:          {client_id: update_dict} for participating clients.
-            participating_ids: IDs of clients who submitted updates this round.
-
-        Returns:
-            Updated reputation scores for all clients.
+        
         """
         consensus = self.compute_consensus(updates)
         consensus_flat = self._flat(consensus)
