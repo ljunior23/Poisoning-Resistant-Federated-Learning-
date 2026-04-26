@@ -83,12 +83,6 @@ class BackdoorDataset(Dataset):
     Injects a small trigger pattern (white square) into a fraction of samples
     and relabels them as target_class.
 
-    Args:
-        dataset:       Base dataset.
-        target_class:  Class all triggered samples map to.
-        poison_rate:   Fraction of samples to poison (0–1).
-        trigger_size:  Side length of the white-square trigger in pixels.
-        trigger_pos:   (row, col) of trigger top-left corner.
     """
 
     def __init__(
