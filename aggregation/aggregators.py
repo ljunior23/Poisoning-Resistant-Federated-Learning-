@@ -71,7 +71,7 @@ def trimmed_mean(
     return aggregated
 
 
-# rum
+# krum
 
 def krum(
     updates: List[Dict[str, torch.Tensor]],
