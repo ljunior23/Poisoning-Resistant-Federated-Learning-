@@ -1,14 +1,10 @@
-"""
-Quick unit tests for BFT-FL components (no data download needed).
-Run from /home/claude/bfl: python tests/test_components.py
-"""
 import sys, os
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import torch
 import numpy as np
 
-# ── Test 1: Model forward pass ────────────────────────────────────────────────
+# Test 1: Model forward pass
 def test_models():
     from core.model import get_model
     mnist_model = get_model("mnist")
@@ -23,7 +19,7 @@ def test_models():
     print("✓ Models: MNIST and CIFAR-10 forward pass OK")
 
 
-# ── Test 2: Aggregation methods ───────────────────────────────────────────────
+# Test 2: Aggregation methods 
 def test_aggregators():
     from aggregation.aggregators import fedavg, coordinate_median, trimmed_mean, krum, reputation_fedavg
 
@@ -48,7 +44,7 @@ def test_aggregators():
     print("✓ Aggregators: FedAvg, Median, TrimmedMean, Krum, Reputation OK")
 
 
-# ── Test 3: Attack functions ───────────────────────────────────────────────────
+# Test 3: Attack functions
 def test_attacks():
     from attacks.poisoning import byzantine_attack, scale_attack
 
@@ -61,7 +57,7 @@ def test_attacks():
     print("✓ Attacks: Byzantine and Scale OK")
 
 
-# ── Test 4: Blockchain reputation system ─────────────────────────────────────
+# Test 4: Blockchain reputation system
 def test_blockchain():
     from blockchain.reputation import ReputationBlockchain
 
@@ -95,7 +91,7 @@ def test_blockchain():
     print("✓ Blockchain: Reputation scoring, chain integrity, exclusion OK")
 
 
-# ── Test 5: Full mini server round (no data download) ────────────────────────
+# Test 5: Full mini server round (no data download) 
 def test_server_round():
     from core.model import get_model
     from core.server import FLServer
@@ -129,7 +125,7 @@ def test_server_round():
     print("✓ Server: Full training round with reputation aggregation OK")
 
 
-# ── Run all ───────────────────────────────────────────────────────────────────
+# Run all
 if __name__ == "__main__":
     print("\n" + "="*55)
     print("  BFT-FL Component Tests")
